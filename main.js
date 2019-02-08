@@ -15,9 +15,11 @@ const pluginOptions = {
 // The main plugin function.
 // Returns a dialog that communicates the outcome of running the plugin to the user.
 async function exportRendition(selection) {
+  const languageCode = application.appLanguage;
+
   // Exit if there is no selection
   if (selection.items.length === 0)
-    return displayError(results.errorNoSelection);
+    return displayError(results.errorNoSelection, languageCode);
 
   // Try to get rendition results for the first item in the selection.
   // Exit if there is an error encountered along the way.
@@ -26,11 +28,11 @@ async function exportRendition(selection) {
     const selectionItemToRender = selection.items[0];
     renditionResults = await renderToFile(selectionItemToRender);
   } catch (err) {
-    return displayError(err);
+    return displayError(err, languageCode);
   }
 
   // Success! Let the user know!
-  return showDialog(results.success, renditionResults);
+  return showDialog(results.success, languageCode, renditionResults);
 }
 
 // Creates the rendition and returns the results.
@@ -91,19 +93,19 @@ function throwError(err) {
 
 // Takes in thrown error messages and
 // displays the appropriate strings to the user in a dialog.
-function displayError(err) {
+function displayError(err, languageCode) {
   switch (err) {
     case results.errorNoSelection:
-      return showDialog(results.errorNoSelection);
+      return showDialog(results.errorNoSelection, languageCode);
     case results.errorNoFolder:
-      return showDialog(results.errorNoFolder);
+      return showDialog(results.errorNoFolder, languageCode);
     case results.errorFileExists:
-      return showDialog(results.errorFileExists);
+      return showDialog(results.errorFileExists, languageCode);
     case results.errorRenditionsFailed:
-      return showDialog(results.errorRenditionsFailed);
+      return showDialog(results.errorRenditionsFailed, languageCode);
 
     default:
-      return showDialog(results.errorUnknown);
+      return showDialog(results.errorUnknown, languageCode);
   }
 }
 

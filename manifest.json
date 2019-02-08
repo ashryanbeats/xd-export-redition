@@ -9,7 +9,10 @@
   "uiEntryPoints": [
     {
       "type": "menu",
-      "label": "[Sample] How to export a rendition",
+      "label": {
+        "default": "[Sample] Export rendition",
+        "ja": "[サンプル] レンディションを保存する"
+      },
       "commandId": "exportRendition"
     }
   ]

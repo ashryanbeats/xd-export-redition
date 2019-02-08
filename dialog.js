@@ -1,4 +1,4 @@
-function showDialog(resultStrings, renditionResults) {
+function showDialog(resultStrings, languageCode, renditionResults) {
   let dialog = document.createElement("dialog");
 
   // create the form element, which has default styling and spacing
@@ -8,11 +8,11 @@ function showDialog(resultStrings, renditionResults) {
 
   // add form content
   let title = document.createElement("h1");
-  title.textContent = resultStrings.h1;
+  title.textContent = resultStrings[languageCode].h1;
   form.appendChild(title);
 
   let p = document.createElement("p");
-  p.textContent = resultStrings.p;
+  p.textContent = resultStrings[languageCode].p;
   form.appendChild(p);
 
   if (renditionResults) {
@@ -28,7 +28,7 @@ function showDialog(resultStrings, renditionResults) {
   // include at least one way to close the dialog
   let closeButton = document.createElement("button");
   closeButton.uxpVariant = "cta";
-  closeButton.textContent = resultStrings.button;
+  closeButton.textContent = resultStrings[languageCode].button;
   closeButton.onclick = e => dialog.close();
   footer.appendChild(closeButton);
 
