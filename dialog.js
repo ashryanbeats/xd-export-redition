@@ -1,39 +1,45 @@
 function showDialog(resultStrings, languageCode, renditionResults) {
-  let dialog = document.createElement("dialog");
+  document.body.innerHTML = `
+    <style>
+      form {
+        width: 400;
+      }
+      .checkbox-wrapper {
+        align-items: center;
+      }
+    </style>
+    <dialog>
+      <form>
+        <h1>${resultStrings[languageCode].h1}</h1>
+        <p>${resultStrings[languageCode].p}</p>
+        ${
+          renditionResults
+            ? `<p>${renditionResults[0].outputFile.nativePath}</p>`
+            : ""
+        }
+        <footer>
+          ${
+            resultStrings[languageCode].checkbox
+              ? `
+            <label class="row checkbox-wrapper">
+              <input type="checkbox" />
+              <span>Don't show this message again</span>
+            </label>
+          `
+              : ""
+          }
+          <button uxp-variant="cta" id="ok-button">${
+            resultStrings[languageCode].button
+          }</button>
+        </footer>
+      </form>
+    </dialog>
+  `;
 
-  // create the form element, which has default styling and spacing
-  let form = document.createElement("form");
-  dialog.appendChild(form);
-  form.style.width = 400;
+  const okButton = document.querySelector("#ok-button");
+  okButton.addEventListener("click", e => dialog.close());
 
-  // add form content
-  let title = document.createElement("h1");
-  title.textContent = resultStrings[languageCode].h1;
-  form.appendChild(title);
-
-  let p = document.createElement("p");
-  p.textContent = resultStrings[languageCode].p;
-  form.appendChild(p);
-
-  if (renditionResults) {
-    let p = document.createElement("p");
-    p.textContent = renditionResults[0].outputFile.nativePath;
-    form.appendChild(p);
-  }
-
-  // create a footer to hold your form dismissal button
-  let footer = document.createElement("footer");
-  form.appendChild(footer);
-
-  // include at least one way to close the dialog
-  let closeButton = document.createElement("button");
-  closeButton.uxpVariant = "cta";
-  closeButton.textContent = resultStrings[languageCode].button;
-  closeButton.onclick = e => dialog.close();
-  footer.appendChild(closeButton);
-
-  // append dialog to DOM and show modal
-  document.body.appendChild(dialog);
+  const dialog = document.querySelector("dialog");
   return dialog.showModal();
 }
 

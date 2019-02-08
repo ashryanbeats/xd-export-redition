@@ -18,13 +18,15 @@ const results = {
       h1: "No folder selected",
       p:
         "To save a rendition, please run the plugin again and choose a destination folder in the system folder picker.",
-      button: "OK!"
+      button: "OK!",
+      checkbox: "Don't show this message again"
     },
     ja: {
       h1: "フォルダーを選択してください",
       p:
         "レンディションを保存するには、プラグインを再度実行し、システムフォルダピッカーでデスティネーションフォルダを選択してください。",
-      button: "了解！"
+      button: "了解！",
+      checkbox: "Don't show this message again"
     }
   },
   errorNoSelection: {

@@ -80,6 +80,7 @@ async function createFile() {
 // Takes in application error messages
 // and throws the appropriate error from the `results` object
 function throwError(err) {
+  console.log(err);
   switch (err.message) {
     case xdLogMessages.errorNoFolder:
       throw results.errorNoFolder;
