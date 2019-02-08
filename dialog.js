@@ -1,3 +1,5 @@
+const { togglePrefs } = require("./prefs.js");
+
 function showDialog(resultStrings, languageCode, renditionResults) {
   document.body.innerHTML = `
     <style>
@@ -22,7 +24,7 @@ function showDialog(resultStrings, languageCode, renditionResults) {
             resultStrings[languageCode].checkbox
               ? `
             <label class="row checkbox-wrapper">
-              <input type="checkbox" />
+              <input type="checkbox" id="skip-no-folder-msg"/>
               <span>Don't show this message again</span>
             </label>
           `
@@ -35,6 +37,9 @@ function showDialog(resultStrings, languageCode, renditionResults) {
       </form>
     </dialog>
   `;
+
+  const skipNoFolderMsg = document.querySelector("#skip-no-folder-msg");
+  skipNoFolderMsg.addEventListener("change", togglePrefs);
 
   const okButton = document.querySelector("#ok-button");
   okButton.addEventListener("click", e => dialog.close());

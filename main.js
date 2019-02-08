@@ -2,6 +2,7 @@ const application = require("application");
 const fs = require("uxp").storage.localFileSystem;
 const { results, xdLogMessages } = require("./strings.js");
 const { showDialog } = require("./dialog.js");
+const { getPrefs } = require("./prefs.js");
 
 // Options or settings for this plugin for developers to play with.
 // With additional work, you could make these user-settable.
@@ -12,10 +13,13 @@ const pluginOptions = {
   filename: "rendition.png"
 };
 
+let prefs;
+
 // The main plugin function.
 // Returns a dialog that communicates the outcome of running the plugin to the user.
 async function exportRendition(selection) {
   const languageCode = application.appLanguage;
+  prefs = await getPrefs();
 
   // Exit if there is no selection
   if (selection.items.length === 0)
@@ -99,7 +103,9 @@ function displayError(err, languageCode) {
     case results.errorNoSelection:
       return showDialog(results.errorNoSelection, languageCode);
     case results.errorNoFolder:
-      return showDialog(results.errorNoFolder, languageCode);
+      return prefs.showNoFolderMessage
+        ? showDialog(results.errorNoFolder, languageCode)
+        : null;
     case results.errorFileExists:
       return showDialog(results.errorFileExists, languageCode);
     case results.errorRenditionsFailed:
