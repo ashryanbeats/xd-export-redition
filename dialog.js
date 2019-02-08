@@ -1,6 +1,7 @@
 const { togglePrefs } = require("./prefs.js");
 
 function showDialog(resultStrings, languageCode, renditionResults) {
+  // HTML markup
   document.body.innerHTML = `
     <style>
       form {
@@ -38,8 +39,9 @@ function showDialog(resultStrings, languageCode, renditionResults) {
     </dialog>
   `;
 
+  // Add event handlers
   const skipNoFolderMsg = document.querySelector("#skip-no-folder-msg");
-  skipNoFolderMsg.addEventListener("change", togglePrefs);
+  if (skipNoFolderMsg) skipNoFolderMsg.addEventListener("change", togglePrefs);
 
   const okButton = document.querySelector("#ok-button");
   okButton.addEventListener("click", e => dialog.close());
