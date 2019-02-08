@@ -1,6 +1,6 @@
 {
   "id": "HOW_TO_EXPORT_A_RENDITION",
-  "name": "(H2) Export Rendition Plugin",
+  "name": "Export Rendition",
   "version": "1.0.0",
   "host": {
     "app": "XD",
