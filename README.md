@@ -6,6 +6,6 @@ This sample generates an export rendition of an object in XD as PNG.
 ## Usage
 
 1. Select an object in an XD document
-1. Run "Plugins > \[Sample\] How to export a rendition"
+1. Run "Plugins > \[Sample\] Export rendition"
 1. Select the destination folder from the picker
 1. Get confirmation of success or errors in a modal dialog
