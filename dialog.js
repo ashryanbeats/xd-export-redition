@@ -17,7 +17,9 @@ function showDialog(resultStrings, languageCode, renditionResults) {
         <p>${resultStrings[languageCode].p}</p>
         ${
           renditionResults
-            ? `<p>${renditionResults[0].outputFile.nativePath}</p>`
+            ? `<input type="text" readonly uxp-quiet="true" value=${
+                renditionResults[0].outputFile.nativePath
+              }>`
             : ""
         }
         <footer>
@@ -46,6 +48,7 @@ function showDialog(resultStrings, languageCode, renditionResults) {
   const okButton = document.querySelector("#ok-button");
   okButton.addEventListener("click", e => dialog.close());
 
+  // Show the modal
   const dialog = document.querySelector("dialog");
   return dialog.showModal();
 }
