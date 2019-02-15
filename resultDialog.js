@@ -1,6 +1,6 @@
 const { togglePrefs } = require("./prefs.js");
 
-function showDialog(resultStrings, languageCode, renditionResults) {
+function showResultDialog(resultStrings, languageCode, renditionResults) {
   // HTML markup
   document.body.innerHTML = `
     <style>
@@ -54,5 +54,5 @@ function showDialog(resultStrings, languageCode, renditionResults) {
 }
 
 module.exports = {
-  showDialog
+  showResultDialog
 };

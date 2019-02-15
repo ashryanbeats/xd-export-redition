@@ -1,18 +1,39 @@
-const fs = require("uxp").storage.localFileSystem;
+const application = require("application");
+const { localFileSystem, errors } = require("uxp").storage;
 const { xdLogMessages } = require("./strings.js");
 
-async function createPrefs(prefsObj = { showNoFolderMessage: true }) {
+const defaultPrefs = {
+  showNoFolderMessage: true,
+  renditionType: application.RenditionType.PNG,
+  overwriteFile: true,
+  scale: 2,
+  filename: "rendition.png"
+};
+
+function getImageTypeOptions() {
+  return Object.keys(application.RenditionType);
+}
+
+async function createPrefs(prefsObj = defaultPrefs) {
   const prefsString = JSON.stringify(prefsObj);
-  const dataFolder = await fs.getDataFolder();
+  const dataFolder = await localFileSystem.getDataFolder();
   const prefsFile = await dataFolder.createFile("prefs.json", {
     overwrite: true
   });
 
-  return await prefsFile.write(prefsString);
+  try {
+    await prefsFile.write(prefsString);
+    return true;
+  } catch (err) {
+    if (err instanceof errors.FileIsReadOnly) {
+      // todo
+      console.log("prefs file is readonly");
+    }
+  }
 }
 
 async function getPrefs() {
-  const dataFolder = await fs.getDataFolder();
+  const dataFolder = await localFileSystem.getDataFolder();
 
   try {
     const prefsFile = await dataFolder.getEntry("prefs.json");
@@ -41,7 +62,32 @@ async function togglePrefs() {
   return createPrefs(prefsObj);
 }
 
+async function updateOverwritePref() {
+  const prefsObj = await getPrefs();
+  prefsObj.overwriteFile = !prefsObj.overwriteFile;
+
+  return createPrefs(prefsObj);
+}
+
+async function updateImageTypePref(e) {
+  const prefsObj = await getPrefs();
+  prefsObj.renditionType = e.target.value;
+
+  return createPrefs(prefsObj);
+}
+
+async function updateScalePref(e) {
+  const prefsObj = await getPrefs();
+  prefsObj.scale = e.target.value;
+
+  return createPrefs(prefsObj);
+}
+
 module.exports = {
   getPrefs,
-  togglePrefs
+  togglePrefs,
+  updateOverwritePref,
+  updateImageTypePref,
+  updateScalePref,
+  getImageTypeOptions
 };

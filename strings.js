@@ -1,6 +1,14 @@
 // An object representing possible outcomes of running the plugin.
 // Contains strings to display in the dialog.
 const results = {
+  controls: {
+    en: {
+      h1: "Export a rendition",
+      okButton: "Export Rendition",
+      cancelButton: "Cancel"
+    },
+    ja: {}
+  },
   success: {
     en: {
       h1: "Your rendition has been saved!",

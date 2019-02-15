@@ -1,7 +1,8 @@
 const application = require("application");
 const fs = require("uxp").storage.localFileSystem;
 const { results, xdLogMessages } = require("./strings.js");
-const { showDialog } = require("./dialog.js");
+const { showControlDialog } = require("./controlDialog.js");
+const { showResultDialog } = require("./resultDialog.js");
 const { getPrefs } = require("./prefs.js");
 
 // Options or settings for this plugin for developers to play with.
@@ -20,23 +21,27 @@ let prefs;
 async function exportRendition(selection) {
   const languageCode = application.appLanguage;
   prefs = await getPrefs();
+  console.log(prefs);
+  console.log(typeof prefs);
 
-  // Exit if there is no selection
-  if (selection.items.length === 0)
-    return displayError(results.errorNoSelection, languageCode);
+  return showControlDialog(results.controls, languageCode, prefs);
 
-  // Try to get rendition results for the first item in the selection.
-  // Exit if there is an error encountered along the way.
-  let renditionResults;
-  try {
-    const selectionItemToRender = selection.items[0];
-    renditionResults = await renderToFile(selectionItemToRender);
-  } catch (err) {
-    return displayError(err, languageCode);
-  }
+  // // Exit if there is no selection
+  // if (selection.items.length === 0)
+  //   return displayError(results.errorNoSelection, languageCode);
 
-  // Success! Let the user know!
-  return showDialog(results.success, languageCode, renditionResults);
+  // // Try to get rendition results for the first item in the selection.
+  // // Exit if there is an error encountered along the way.
+  // let renditionResults;
+  // try {
+  //   const selectionItemToRender = selection.items[0];
+  //   renditionResults = await renderToFile(selectionItemToRender);
+  // } catch (err) {
+  //   return displayError(err, languageCode);
+  // }
+
+  // // Success! Let the user know!
+  // return showResultDialog(results.success, languageCode, renditionResults);
 }
 
 // Creates the rendition and returns the results.
@@ -101,18 +106,18 @@ function throwError(err) {
 function displayError(err, languageCode) {
   switch (err) {
     case results.errorNoSelection:
-      return showDialog(results.errorNoSelection, languageCode);
+      return showResultDialog(results.errorNoSelection, languageCode);
     case results.errorNoFolder:
       return prefs.showNoFolderMessage
-        ? showDialog(results.errorNoFolder, languageCode)
+        ? showResultDialog(results.errorNoFolder, languageCode)
         : null;
     case results.errorFileExists:
-      return showDialog(results.errorFileExists, languageCode);
+      return showResultDialog(results.errorFileExists, languageCode);
     case results.errorRenditionsFailed:
-      return showDialog(results.errorRenditionsFailed, languageCode);
+      return showResultDialog(results.errorRenditionsFailed, languageCode);
 
     default:
-      return showDialog(results.errorUnknown, languageCode);
+      return showResultDialog(results.errorUnknown, languageCode);
   }
 }
 
