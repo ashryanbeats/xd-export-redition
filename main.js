@@ -5,51 +5,47 @@ const { showControlDialog } = require("./controlDialog.js");
 const { showResultDialog } = require("./resultDialog.js");
 const { getPrefs } = require("./prefs.js");
 
-// Options or settings for this plugin for developers to play with.
-// With additional work, you could make these user-settable.
-const pluginOptions = {
-  renditionType: application.RenditionType.PNG,
-  overwriteFile: true,
-  scale: 2,
-  filename: "rendition.png"
-};
-
-let prefs;
-
 // The main plugin function.
 // Returns a dialog that communicates the outcome of running the plugin to the user.
 async function exportRendition(selection) {
   const languageCode = application.appLanguage;
-  prefs = await getPrefs();
-  console.log(prefs);
-  console.log(typeof prefs);
 
-  return showControlDialog(results.controls, languageCode, prefs);
+  // Exit if there is no selection
+  if (selection.items.length === 0)
+    return displayError(results.errorNoSelection, languageCode);
 
-  // // Exit if there is no selection
-  // if (selection.items.length === 0)
-  //   return displayError(results.errorNoSelection, languageCode);
+  const intialPrefs = await getPrefs();
 
-  // // Try to get rendition results for the first item in the selection.
-  // // Exit if there is an error encountered along the way.
-  // let renditionResults;
-  // try {
-  //   const selectionItemToRender = selection.items[0];
-  //   renditionResults = await renderToFile(selectionItemToRender);
-  // } catch (err) {
-  //   return displayError(err, languageCode);
-  // }
+  const dialogResult = await showControlDialog(
+    results.controls,
+    languageCode,
+    intialPrefs
+  );
 
-  // // Success! Let the user know!
-  // return showResultDialog(results.success, languageCode, renditionResults);
+  if (dialogResult === "reasonCanceled") return;
+
+  const updatedPrefs = await getPrefs();
+
+  // Try to get rendition results for the first item in the selection.
+  // Exit if there is an error encountered along the way.
+  let renditionResults;
+  try {
+    const selectionItemToRender = selection.items[0];
+    renditionResults = await renderToFile(selectionItemToRender, updatedPrefs);
+  } catch (err) {
+    return displayError(err, languageCode);
+  }
+
+  // Success! Let the user know!
+  return showResultDialog(results.success, languageCode, renditionResults);
 }
 
 // Creates the rendition and returns the results.
-async function renderToFile(selectionItemToRender) {
+async function renderToFile(selectionItemToRender, prefs) {
   // Try to create a File that will contain the output of the rendition.
   let file;
   try {
-    file = await createFile();
+    file = await createFile(prefs);
   } catch (err) {
     throw err;
   }
@@ -58,8 +54,11 @@ async function renderToFile(selectionItemToRender) {
     {
       node: selectionItemToRender,
       outputFile: file,
-      type: pluginOptions.renditionType,
-      scale: pluginOptions.scale
+      type: prefs.renditionType,
+      scale: prefs.scale,
+      quality: 100,
+      minify: false,
+      embedImages: true
     }
   ];
 
@@ -67,6 +66,7 @@ async function renderToFile(selectionItemToRender) {
   try {
     return await application.createRenditions(renditionSettings);
   } catch (err) {
+    console.log(err);
     throw results.errorRenditionsFailed;
   }
 }
@@ -75,11 +75,17 @@ async function renderToFile(selectionItemToRender) {
 // tries to create a File that will contain the output of the rendition.
 // This will fail if the user doesn't select a destination folder in the picker
 // or if file overwrite isn't set to true and the file already exists.
-async function createFile() {
+async function createFile(prefs) {
+  console.log("createFile");
+  console.log(prefs);
   try {
     const folder = await fs.getFolder();
-    return await folder.createFile(pluginOptions.filename, {
-      overwrite: pluginOptions.overwriteFile
+    const filenameWithExtension = `${prefs.filename}.${prefs.renditionType}`;
+    console.log("folder");
+    console.log(folder.isFolder);
+
+    return await folder.createFile(filenameWithExtension, {
+      overwrite: prefs.overwriteFile
     });
   } catch (err) {
     throwError(err);

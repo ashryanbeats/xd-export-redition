@@ -12,7 +12,7 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
       }
     </style>
     <dialog>
-      <form>
+      <form method="dialog">
         <h1>${resultStrings[languageCode].h1}</h1>
         <p>${resultStrings[languageCode].p}</p>
         ${

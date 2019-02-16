@@ -7,11 +7,13 @@ const defaultPrefs = {
   renditionType: application.RenditionType.PNG,
   overwriteFile: true,
   scale: 2,
-  filename: "rendition.png"
+  filename: ""
 };
 
 function getImageTypeOptions() {
-  return Object.keys(application.RenditionType);
+  return Object.keys(application.RenditionType).map(
+    key => application.RenditionType[key]
+  );
 }
 
 async function createPrefs(prefsObj = defaultPrefs) {
@@ -23,7 +25,7 @@ async function createPrefs(prefsObj = defaultPrefs) {
 
   try {
     await prefsFile.write(prefsString);
-    return true;
+    return await getPrefs();
   } catch (err) {
     if (err instanceof errors.FileIsReadOnly) {
       // todo
@@ -37,13 +39,12 @@ async function getPrefs() {
 
   try {
     const prefsFile = await dataFolder.getEntry("prefs.json");
-    console.log("prefs gotten");
 
     return JSON.parse(await prefsFile.read());
   } catch (err) {
     switch (err.message) {
       case xdLogMessages.errorFileNotFound:
-        return createPrefs();
+        return await createPrefs();
 
       default:
         console.log(err);
@@ -56,8 +57,6 @@ async function togglePrefs() {
 
   const prefsObj = await getPrefs();
   prefsObj.showNoFolderMessage = !prefsObj.showNoFolderMessage;
-
-  console.log(prefsObj);
 
   return createPrefs(prefsObj);
 }
@@ -83,11 +82,19 @@ async function updateScalePref(e) {
   return createPrefs(prefsObj);
 }
 
+async function updateFilenamePref(filename) {
+  const prefsObj = await getPrefs();
+  prefsObj.filename = filename;
+
+  return createPrefs(prefsObj);
+}
+
 module.exports = {
   getPrefs,
   togglePrefs,
   updateOverwritePref,
   updateImageTypePref,
   updateScalePref,
+  updateFilenamePref,
   getImageTypeOptions
 };

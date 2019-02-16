@@ -1,11 +1,12 @@
 const {
-  updateOverwritePref,
   getImageTypeOptions,
+  updateOverwritePref,
   updateImageTypePref,
-  updateScalePref
+  updateScalePref,
+  updateFilenamePref
 } = require("./prefs.js");
 
-function showControlDialog(resultStrings, languageCode, prefs) {
+async function showControlDialog(resultStrings, languageCode, prefs) {
   const imageTypeOptions = getImageTypeOptions();
   const imageTypePref = prefs.renditionType;
 
@@ -22,14 +23,20 @@ function showControlDialog(resultStrings, languageCode, prefs) {
         justify-content: space-between;
       }
     </style>
-    <dialog>
-      <form method="dialog">
+    <dialog id="dialog">
+      <form id="control-form" method="dialog">
         <h1>${resultStrings[languageCode].h1}</h1>
+        <label class="row row-wrapper">
+          <span>File name</span>
+          <input id="file-name" type="text" uxp-quiet="false" placeholder="Enter a file name" ${
+            prefs.filename.length ? `value="${prefs.filename}"` : null
+          } />
+        </label>
         <label class="row row-wrapper">
           <span>Image type to render</span>
           <select id="file-type-select">
             ${getImageTypeOptions().map(el => {
-              return `<option value="${el}">${el}</option>`;
+              return `<option value="${el}">${el.toUpperCase()}</option>`;
             })}
           </select>
         </label>
@@ -52,7 +59,7 @@ function showControlDialog(resultStrings, languageCode, prefs) {
           <button uxp-variant="primary" id="cancel-button">${
             resultStrings[languageCode].cancelButton
           }</button>
-          <button uxp-variant="cta" id="ok-button">${
+          <button type="submit" uxp-variant="cta" id="ok-button">${
             resultStrings[languageCode].okButton
           }</button>
         </footer>
@@ -61,6 +68,12 @@ function showControlDialog(resultStrings, languageCode, prefs) {
   `;
 
   // Add event handlers
+  const dialog = document.querySelector("dialog");
+
+  const form = document.querySelector("form");
+  const filenameInput = document.querySelector("#file-name");
+  form.addEventListener("submit", e => handleSubmit(e, filenameInput));
+
   const select = document.querySelector("#file-type-select");
   select.addEventListener("change", updateImageTypePref);
   setSelectedFileType(imageTypeOptions, imageTypePref);
@@ -77,14 +90,14 @@ function showControlDialog(resultStrings, languageCode, prefs) {
   overwriteFile.addEventListener("change", updateOverwritePref);
 
   const cancelButton = document.querySelector("#cancel-button");
-  cancelButton.addEventListener("click", e => dialog.close());
-
-  const okButton = document.querySelector("#ok-button");
-  okButton.addEventListener("click", e => dialog.close());
+  cancelButton.addEventListener("click", e => dialog.close("reasonCanceled"));
 
   // Show the modal
-  const dialog = document.querySelector("dialog");
-  return dialog.showModal();
+  try {
+    return await dialog.showModal();
+  } catch (err) {
+    console.log(err.message);
+  }
 }
 
 // Workaround since dropdowns don't support `selected` / `disabled` yet
@@ -92,6 +105,12 @@ function showControlDialog(resultStrings, languageCode, prefs) {
 function setSelectedFileType(imageTypeOptions, imageTypePref) {
   const select = document.querySelector("#file-type-select");
   select.selectedIndex = imageTypeOptions.indexOf(imageTypePref);
+}
+
+async function handleSubmit(e, filenameInput) {
+  const filename = filenameInput.value;
+
+  await updateFilenamePref(filename);
 }
 
 module.exports = {
