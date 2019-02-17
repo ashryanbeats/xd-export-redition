@@ -1,12 +1,6 @@
-const {
-  getImageTypeOptions,
-  updateOverwritePref,
-  updateImageTypePref,
-  updateScalePref,
-  updateFilenamePref
-} = require("./prefs.js");
+const { createPrefs, getImageTypeOptions } = require("./prefs.js");
 
-async function showControlDialog(resultStrings, languageCode, prefs) {
+async function getControlDialog(resultStrings, languageCode, prefs) {
   const imageTypeOptions = getImageTypeOptions();
   const imageTypePref = prefs.renditionType;
 
@@ -23,7 +17,7 @@ async function showControlDialog(resultStrings, languageCode, prefs) {
         justify-content: space-between;
       }
     </style>
-    <dialog id="dialog">
+    <dialog id="control-dialog">
       <form id="control-form" method="dialog">
         <h1>${resultStrings[languageCode].h1}</h1>
         <label class="row row-wrapper">
@@ -56,7 +50,7 @@ async function showControlDialog(resultStrings, languageCode, prefs) {
           }>
         </label>
         <footer>
-          <button uxp-variant="primary" id="cancel-button">${
+          <button id="cancel-button">${
             resultStrings[languageCode].cancelButton
           }</button>
           <button type="submit" uxp-variant="cta" id="ok-button">${
@@ -66,35 +60,30 @@ async function showControlDialog(resultStrings, languageCode, prefs) {
       </form>
     </dialog>
   `;
-
-  // Add event handlers
-  const dialog = document.querySelector("dialog");
-
-  const form = document.querySelector("form");
-  const filenameInput = document.querySelector("#file-name");
-  form.addEventListener("submit", e => handleSubmit(e, filenameInput));
-
-  const select = document.querySelector("#file-type-select");
-  select.addEventListener("change", updateImageTypePref);
   setSelectedFileType(imageTypeOptions, imageTypePref);
 
-  const range = document.querySelector("#scale-range");
+  // Add event handlers
+  const [dialog, form, range, cancelButton, okButton] = [
+    "#control-dialog",
+    "#control-dialog form",
+    "#scale-range",
+    "#cancel-button",
+    "#ok-button"
+  ].map(s => document.querySelector(s));
+
+  cancelButton.addEventListener("click", e => dialog.close("reasonCanceled"));
+  okButton.addEventListener("click", e => handleSubmit(e, dialog, prefs));
+  form.onsubmit = e => handleSubmit(e, dialog, prefs);
+
   const displayValue = document.querySelector("#scale-display-value");
-  range.addEventListener("change", updateScalePref);
   range.addEventListener(
     "change",
     e => (displayValue.textContent = e.target.value)
   );
 
-  const overwriteFile = document.querySelector("#overwrite-file");
-  overwriteFile.addEventListener("change", updateOverwritePref);
-
-  const cancelButton = document.querySelector("#cancel-button");
-  cancelButton.addEventListener("click", e => dialog.close("reasonCanceled"));
-
   // Show the modal
   try {
-    return await dialog.showModal();
+    return dialog;
   } catch (err) {
     console.log(err.message);
   }
@@ -107,12 +96,39 @@ function setSelectedFileType(imageTypeOptions, imageTypePref) {
   select.selectedIndex = imageTypeOptions.indexOf(imageTypePref);
 }
 
-async function handleSubmit(e, filenameInput) {
-  const filename = filenameInput.value;
+async function handleSubmit(e, dialog, currentPrefs) {
+  saveAndClose(dialog, currentPrefs);
+  e.preventDefault();
+}
 
-  await updateFilenamePref(filename);
+async function saveAndClose(dialog, currentPrefs) {
+  const savedPrefs = await savePrefs(currentPrefs);
+
+  return await dialog.close(savedPrefs);
+}
+
+async function savePrefs(currentPrefs) {
+  const prefsToSave = getSettingsFromForm(currentPrefs);
+  return await createPrefs(prefsToSave);
+}
+
+function getSettingsFromForm(currentPrefs) {
+  const [filenameInput, select, range, overwriteFile] = [
+    "#file-name",
+    "#file-type-select",
+    "#scale-range",
+    "#overwrite-file"
+  ].map(sel => document.querySelector(sel));
+
+  return {
+    ...currentPrefs,
+    renditionType: select.value,
+    overwriteFile: overwriteFile.checked ? true : false,
+    scale: Number(range.value),
+    filename: filenameInput.value
+  };
 }
 
 module.exports = {
-  showControlDialog
+  getControlDialog
 };

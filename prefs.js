@@ -24,7 +24,8 @@ async function createPrefs(prefsObj = defaultPrefs) {
   });
 
   try {
-    await prefsFile.write(prefsString);
+    const done = await prefsFile.write(prefsString);
+    console.log("done", done);
     return await getPrefs();
   } catch (err) {
     if (err instanceof errors.FileIsReadOnly) {
@@ -39,8 +40,9 @@ async function getPrefs() {
 
   try {
     const prefsFile = await dataFolder.getEntry("prefs.json");
+    const prefsJSON = await prefsFile.read();
 
-    return JSON.parse(await prefsFile.read());
+    return JSON.parse(prefsJSON);
   } catch (err) {
     switch (err.message) {
       case xdLogMessages.errorFileNotFound:
@@ -61,40 +63,9 @@ async function togglePrefs() {
   return createPrefs(prefsObj);
 }
 
-async function updateOverwritePref() {
-  const prefsObj = await getPrefs();
-  prefsObj.overwriteFile = !prefsObj.overwriteFile;
-
-  return createPrefs(prefsObj);
-}
-
-async function updateImageTypePref(e) {
-  const prefsObj = await getPrefs();
-  prefsObj.renditionType = e.target.value;
-
-  return createPrefs(prefsObj);
-}
-
-async function updateScalePref(e) {
-  const prefsObj = await getPrefs();
-  prefsObj.scale = e.target.value;
-
-  return createPrefs(prefsObj);
-}
-
-async function updateFilenamePref(filename) {
-  const prefsObj = await getPrefs();
-  prefsObj.filename = filename;
-
-  return createPrefs(prefsObj);
-}
-
 module.exports = {
   getPrefs,
+  createPrefs,
   togglePrefs,
-  updateOverwritePref,
-  updateImageTypePref,
-  updateScalePref,
-  updateFilenamePref,
   getImageTypeOptions
 };

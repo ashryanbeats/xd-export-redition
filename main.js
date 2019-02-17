@@ -1,7 +1,7 @@
 const application = require("application");
 const fs = require("uxp").storage.localFileSystem;
 const { results, xdLogMessages } = require("./strings.js");
-const { showControlDialog } = require("./controlDialog.js");
+const { getControlDialog } = require("./controlDialog.js");
 const { showResultDialog } = require("./resultDialog.js");
 const { getPrefs } = require("./prefs.js");
 
@@ -16,22 +16,23 @@ async function exportRendition(selection) {
 
   const intialPrefs = await getPrefs();
 
-  const dialogResult = await showControlDialog(
+  const dialog = await getControlDialog(
     results.controls,
     languageCode,
     intialPrefs
   );
 
-  if (dialogResult === "reasonCanceled") return;
+  const dialogResult = await dialog.showModal();
 
-  const updatedPrefs = await getPrefs();
+  if (dialogResult === "reasonCanceled") return;
+  console.log("dialogResult", dialogResult);
 
   // Try to get rendition results for the first item in the selection.
   // Exit if there is an error encountered along the way.
   let renditionResults;
   try {
     const selectionItemToRender = selection.items[0];
-    renditionResults = await renderToFile(selectionItemToRender, updatedPrefs);
+    renditionResults = await renderToFile(selectionItemToRender, dialogResult);
   } catch (err) {
     return displayError(err, languageCode);
   }
@@ -47,7 +48,7 @@ async function renderToFile(selectionItemToRender, prefs) {
   try {
     file = await createFile(prefs);
   } catch (err) {
-    throw err;
+    return new Error(err);
   }
 
   const renditionSettings = [
@@ -61,6 +62,9 @@ async function renderToFile(selectionItemToRender, prefs) {
       embedImages: true
     }
   ];
+
+  console.log("renderToFile prefs", prefs);
+  console.log("renditionSettings", renditionSettings);
 
   // Try to create the rendition as configured in `renditionSettings`
   try {
@@ -80,9 +84,8 @@ async function createFile(prefs) {
   console.log(prefs);
   try {
     const folder = await fs.getFolder();
+    if (!folder) return new Error(results.errorNoFolder);
     const filenameWithExtension = `${prefs.filename}.${prefs.renditionType}`;
-    console.log("folder");
-    console.log(folder.isFolder);
 
     return await folder.createFile(filenameWithExtension, {
       overwrite: prefs.overwriteFile
@@ -103,6 +106,7 @@ function throwError(err) {
       throw results.errorFileExists;
 
     default:
+      console.log("Error>>>>>>>>>");
       throw results.errorUnknown;
   }
 }
@@ -123,6 +127,7 @@ function displayError(err, languageCode) {
       return showResultDialog(results.errorRenditionsFailed, languageCode);
 
     default:
+      console.log("Error!!!!!!!!!", err);
       return showResultDialog(results.errorUnknown, languageCode);
   }
 }

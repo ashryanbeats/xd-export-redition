@@ -17,9 +17,9 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
         <p>${resultStrings[languageCode].p}</p>
         ${
           renditionResults
-            ? `<input type="text" readonly uxp-quiet="true" value=${
+            ? `<input type="text" readonly uxp-quiet="true" value="${
                 renditionResults[0].outputFile.nativePath
-              }>`
+              }">`
             : ""
         }
         <footer>
