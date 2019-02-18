@@ -1,9 +1,8 @@
 const application = require("application");
 const { results } = require("./strings.js");
-const { getControlDialog } = require("./dialogs/controlDialog.js");
+const { getResultFromControlDialog } = require("./dialogs/controlDialog.js");
 const { showResultDialog } = require("./dialogs/resultDialog.js");
 const { renderToFile } = require("./file-handlers/render.js");
-const { getPrefs } = require("./file-handlers/prefs.js");
 
 async function initiatePlugin(selection) {
   const languageCode = application.appLanguage;
@@ -12,23 +11,15 @@ async function initiatePlugin(selection) {
   if (selection.items.length === 0)
     return displayError(results.errorNoSelection, languageCode);
 
-  return exportRendition(selection, languageCode);
+  let dialogResult = await getResultFromControlDialog(results, languageCode);
+  if (dialogResult === "reasonCanceled") return;
+
+  return exportRendition(selection, dialogResult, languageCode);
 }
 
 // The main plugin function.
 // Returns a dialog that communicates the outcome of running the plugin to the user.
-async function exportRendition(selection, languageCode) {
-  const intialPrefs = await getPrefs();
-
-  const dialog = await getControlDialog(
-    results.controls,
-    languageCode,
-    intialPrefs
-  );
-
-  const dialogResult = await dialog.showModal();
-  if (dialogResult === "reasonCanceled") return;
-
+async function exportRendition(selection, dialogResult, languageCode) {
   // Try to get rendition results for the first item in the selection.
   // Exit if there is an error encountered along the way.
   try {
@@ -42,14 +33,8 @@ async function exportRendition(selection, languageCode) {
     return showResultDialog(results.success, languageCode, renditionResults);
   } catch (err) {
     console.log("[Error]", err.message);
-    return displayError(err, languageCode);
+    return showResultDialog(results[err.message], languageCode);
   }
-}
-
-// Takes in thrown error messages and
-// displays the appropriate strings to the user in a dialog.
-function displayError(err, languageCode) {
-  return showResultDialog(results[err.message], languageCode);
 }
 
 module.exports = {

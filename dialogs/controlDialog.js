@@ -1,7 +1,20 @@
 const {
   createPrefs,
+  getPrefs,
   getImageTypeOptions
 } = require("../file-handlers/prefs.js");
+
+async function getResultFromControlDialog(results, languageCode) {
+  const intialPrefs = await getPrefs();
+
+  const dialog = await getControlDialog(
+    results.controls,
+    languageCode,
+    intialPrefs
+  );
+
+  return await dialog.showModal();
+}
 
 async function getControlDialog(resultStrings, languageCode, prefs) {
   const imageTypeOptions = getImageTypeOptions();
@@ -133,5 +146,5 @@ function getSettingsFromForm(currentPrefs) {
 }
 
 module.exports = {
-  getControlDialog
+  getResultFromControlDialog
 };
