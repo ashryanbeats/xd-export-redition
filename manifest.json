@@ -13,7 +13,7 @@
         "default": "[Sample] Export rendition",
         "ja": "[サンプル] レンディションを保存する"
       },
-      "commandId": "exportRendition",
+      "commandId": "initiatePlugin",
       "shortcut": { "mac": "Cmd+Shift+F", "win": "Ctrl+Shift+F" }
     }
   ]

@@ -1,4 +1,7 @@
-const { createPrefs, getImageTypeOptions } = require("./prefs.js");
+const {
+  createPrefs,
+  getImageTypeOptions
+} = require("../file-handlers/prefs.js");
 
 async function getControlDialog(resultStrings, languageCode, prefs) {
   const imageTypeOptions = getImageTypeOptions();

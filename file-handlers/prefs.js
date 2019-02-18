@@ -1,6 +1,6 @@
 const application = require("application");
 const { localFileSystem, errors } = require("uxp").storage;
-const { xdLogMessages } = require("./strings.js");
+const { xdLogMessages } = require("../strings.js");
 
 const defaultPrefs = {
   showNoFolderMessage: true,

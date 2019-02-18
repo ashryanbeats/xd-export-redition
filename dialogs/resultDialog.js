@@ -1,4 +1,4 @@
-const { togglePrefs } = require("./prefs.js");
+const { togglePrefs } = require("../file-handlers/prefs.js");
 
 function showResultDialog(resultStrings, languageCode, renditionResults) {
   // HTML markup
