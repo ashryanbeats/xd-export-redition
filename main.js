@@ -33,9 +33,9 @@ async function exportRendition(selection, dialogResult, languageCode) {
     // Success! Let the user know!
     return showResultDialog(results.success, languageCode, renditionResults);
   } catch (err) {
-    console.log("[Error]", err.message);
-
     const prefs = await getPrefs();
+    console.log("[Error]", err.message);
+    console.log("prefs", prefs);
 
     if (err.message === "errorNoFolder" && prefs.skipNoFolderMessage) return;
     return showResultDialog(results[err.message], languageCode);
