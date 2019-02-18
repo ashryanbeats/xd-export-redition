@@ -1,16 +1,10 @@
+const { formStyles } = require("./styles.js");
 const { togglePrefs } = require("../file-handlers/prefs.js");
 
 function showResultDialog(resultStrings, languageCode, renditionResults) {
   // HTML markup
   document.body.innerHTML = `
-    <style>
-      form {
-        width: 400;
-      }
-      .checkbox-wrapper {
-        align-items: center;
-      }
-    </style>
+    ${formStyles}
     <dialog>
       <form method="dialog">
         <h1>${resultStrings[languageCode].h1}</h1>
@@ -26,7 +20,7 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
           ${
             resultStrings[languageCode].checkbox
               ? `
-            <label class="row checkbox-wrapper">
+            <label class="row row-wrapper">
               <input type="checkbox" id="skip-no-folder-msg"/>
               <span>Don't show this message again</span>
             </label>

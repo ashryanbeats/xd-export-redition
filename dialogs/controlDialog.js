@@ -1,3 +1,4 @@
+const { formStyles } = require("./styles.js");
 const {
   createPrefs,
   getPrefs,
@@ -22,17 +23,7 @@ async function getControlDialog(resultStrings, languageCode, intialPrefs) {
 
   // HTML markup
   document.body.innerHTML = `
-    <style>
-      form {
-        width: 400;
-      }
-      .row-wrapper {
-        align-items: center;
-      }
-      .spread {
-        justify-content: space-between;
-      }
-    </style>
+    ${formStyles}
     <dialog id="control-dialog">
       <form id="control-form" method="dialog">
         <h1>${resultStrings[languageCode].h1}</h1>
