@@ -1,5 +1,5 @@
 const { formStyles } = require("./styles.js");
-const { togglePrefs } = require("../file-handlers/prefs.js");
+const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
 function showResultDialog(resultStrings, languageCode, renditionResults) {
   // HTML markup
@@ -37,7 +37,8 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
 
   // Add event handlers
   const skipNoFolderMsg = document.querySelector("#skip-no-folder-msg");
-  if (skipNoFolderMsg) skipNoFolderMsg.addEventListener("change", togglePrefs);
+  if (skipNoFolderMsg)
+    skipNoFolderMsg.addEventListener("change", updateNoFolderPref);
 
   const okButton = document.querySelector("#ok-button");
   okButton.addEventListener("click", e => dialog.close());
@@ -45,6 +46,15 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
   // Show the modal
   const dialog = document.querySelector("dialog");
   return dialog.showModal();
+}
+
+async function updateNoFolderPref(e) {
+  const initialPrefs = await getPrefs();
+
+  return await createPrefs({
+    ...initialPrefs,
+    skipNoFolderMessage: e.target.checked
+  });
 }
 
 module.exports = {

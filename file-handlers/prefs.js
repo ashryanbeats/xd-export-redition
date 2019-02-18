@@ -1,9 +1,8 @@
 const application = require("application");
 const { localFileSystem, errors } = require("uxp").storage;
-const { xdLogMessages } = require("../strings.js");
 
 const defaultPrefs = {
-  showNoFolderMessage: true,
+  skipNoFolderMessage: false,
   renditionType: application.RenditionType.PNG,
   overwriteFile: true,
   scale: 2,
@@ -24,7 +23,7 @@ async function createPrefs(prefsObj = defaultPrefs) {
   });
 
   try {
-    const done = await prefsFile.write(prefsString);
+    await prefsFile.write(prefsString);
     return await getPrefs();
   } catch (err) {
     if (err instanceof errors.FileIsReadOnly) {
@@ -43,28 +42,13 @@ async function getPrefs() {
 
     return JSON.parse(prefsJSON);
   } catch (err) {
-    switch (err.message) {
-      case xdLogMessages.errorFileNotFound:
-        return await createPrefs();
-
-      default:
-        console.log(err);
-    }
+    console.log(err.message);
+    return await createPrefs();
   }
-}
-
-async function togglePrefs() {
-  console.log("togglePrefs");
-
-  const prefsObj = await getPrefs();
-  prefsObj.showNoFolderMessage = !prefsObj.showNoFolderMessage;
-
-  return createPrefs(prefsObj);
 }
 
 module.exports = {
   getPrefs,
   createPrefs,
-  togglePrefs,
   getImageTypeOptions
 };
