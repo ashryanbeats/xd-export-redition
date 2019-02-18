@@ -25,7 +25,6 @@ async function createPrefs(prefsObj = defaultPrefs) {
 
   try {
     const done = await prefsFile.write(prefsString);
-    console.log("done", done);
     return await getPrefs();
   } catch (err) {
     if (err instanceof errors.FileIsReadOnly) {

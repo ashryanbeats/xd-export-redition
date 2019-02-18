@@ -95,14 +95,6 @@ const results = {
   }
 };
 
-const xdLogMessages = {
-  errorNoFolder: "Cannot read property 'createFile' of null",
-  errorFileExists:
-    "A File with given name already exists. Set `overwrite: true` to replace.",
-  errorFileNotFound: "getEntry: File with given name not found"
-};
-
 module.exports = {
-  results,
-  xdLogMessages
+  results
 };

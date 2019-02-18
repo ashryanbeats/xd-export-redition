@@ -1,6 +1,6 @@
 const application = require("application");
-const fs = require("uxp").storage.localFileSystem;
-const { results, xdLogMessages } = require("./strings.js");
+const { localFileSystem, errors } = require("uxp").storage;
+const { results } = require("./strings.js");
 const { getControlDialog } = require("./controlDialog.js");
 const { showResultDialog } = require("./resultDialog.js");
 const { getPrefs } = require("./prefs.js");
@@ -23,33 +23,29 @@ async function exportRendition(selection) {
   );
 
   const dialogResult = await dialog.showModal();
-
   if (dialogResult === "reasonCanceled") return;
-  console.log("dialogResult", dialogResult);
 
   // Try to get rendition results for the first item in the selection.
   // Exit if there is an error encountered along the way.
-  let renditionResults;
   try {
     const selectionItemToRender = selection.items[0];
-    renditionResults = await renderToFile(selectionItemToRender, dialogResult);
+    const renditionResults = await renderToFile(
+      selectionItemToRender,
+      dialogResult
+    );
+
+    // Success! Let the user know!
+    return showResultDialog(results.success, languageCode, renditionResults);
   } catch (err) {
+    console.log("[Error]", err.message);
     return displayError(err, languageCode);
   }
-
-  // Success! Let the user know!
-  return showResultDialog(results.success, languageCode, renditionResults);
 }
 
 // Creates the rendition and returns the results.
 async function renderToFile(selectionItemToRender, prefs) {
   // Try to create a File that will contain the output of the rendition.
-  let file;
-  try {
-    file = await createFile(prefs);
-  } catch (err) {
-    return new Error(err);
-  }
+  let file = await createFile(prefs);
 
   const renditionSettings = [
     {
@@ -63,15 +59,11 @@ async function renderToFile(selectionItemToRender, prefs) {
     }
   ];
 
-  console.log("renderToFile prefs", prefs);
-  console.log("renditionSettings", renditionSettings);
-
   // Try to create the rendition as configured in `renditionSettings`
   try {
     return await application.createRenditions(renditionSettings);
   } catch (err) {
-    console.log(err);
-    throw results.errorRenditionsFailed;
+    throw new Error("errorRenditionsFailed");
   }
 }
 
@@ -80,56 +72,24 @@ async function renderToFile(selectionItemToRender, prefs) {
 // This will fail if the user doesn't select a destination folder in the picker
 // or if file overwrite isn't set to true and the file already exists.
 async function createFile(prefs) {
-  console.log("createFile");
-  console.log(prefs);
-  try {
-    const folder = await fs.getFolder();
-    if (!folder) return new Error(results.errorNoFolder);
-    const filenameWithExtension = `${prefs.filename}.${prefs.renditionType}`;
+  const folder = await localFileSystem.getFolder();
+  if (!folder) throw new Error("errorNoFolder");
 
+  const filenameWithExtension = `${prefs.filename}.${prefs.renditionType}`;
+
+  try {
     return await folder.createFile(filenameWithExtension, {
       overwrite: prefs.overwriteFile
     });
   } catch (err) {
-    throwError(err);
-  }
-}
-
-// Takes in application error messages
-// and throws the appropriate error from the `results` object
-function throwError(err) {
-  console.log(err);
-  switch (err.message) {
-    case xdLogMessages.errorNoFolder:
-      throw results.errorNoFolder;
-    case xdLogMessages.errorFileExists:
-      throw results.errorFileExists;
-
-    default:
-      console.log("Error>>>>>>>>>");
-      throw results.errorUnknown;
+    throw new Error("errorFileExists");
   }
 }
 
 // Takes in thrown error messages and
 // displays the appropriate strings to the user in a dialog.
 function displayError(err, languageCode) {
-  switch (err) {
-    case results.errorNoSelection:
-      return showResultDialog(results.errorNoSelection, languageCode);
-    case results.errorNoFolder:
-      return prefs.showNoFolderMessage
-        ? showResultDialog(results.errorNoFolder, languageCode)
-        : null;
-    case results.errorFileExists:
-      return showResultDialog(results.errorFileExists, languageCode);
-    case results.errorRenditionsFailed:
-      return showResultDialog(results.errorRenditionsFailed, languageCode);
-
-    default:
-      console.log("Error!!!!!!!!!", err);
-      return showResultDialog(results.errorUnknown, languageCode);
-  }
+  return showResultDialog(results[err.message], languageCode);
 }
 
 module.exports = {
