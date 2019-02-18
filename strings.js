@@ -1,13 +1,27 @@
 // An object representing possible outcomes of running the plugin.
 // Contains strings to display in the dialog.
-const results = {
+const strings = {
   controls: {
     en: {
       h1: "Export a rendition",
       okButton: "Export Rendition",
-      cancelButton: "Cancel"
+      cancelButton: "Cancel",
+      filenameLabel: "File name",
+      filenamePlaceholder: "Enter a file name",
+      renditionTypeLabel: "Image type to render",
+      renderScaleLabel: "Render scale",
+      overwriteFileLabel: "Overwrite existing file"
     },
-    ja: {}
+    ja: {
+      h1: "レンディションのエクスポート",
+      okButton: "レンディションのエクスポート",
+      cancelButton: "キャンセル",
+      filenameLabel: "ファイル名",
+      filenamePlaceholder: "ファイル名を入力する",
+      renditionTypeLabel: "画像の種類",
+      renderScaleLabel: "設定サイズ",
+      overwriteFileLabel: "既存ファイルを上書きする"
+    }
   },
   success: {
     en: {
@@ -96,5 +110,5 @@ const results = {
 };
 
 module.exports = {
-  results
+  strings
 };

@@ -1,5 +1,5 @@
 const application = require("application");
-const { results } = require("./strings.js");
+const { strings } = require("./strings.js");
 const { getResultFromControlDialog } = require("./dialogs/controlDialog.js");
 const { showResultDialog } = require("./dialogs/resultDialog.js");
 const { renderToFile } = require("./file-handlers/render.js");
@@ -10,9 +10,9 @@ async function initiatePlugin(selection) {
 
   // Exit if there is no selection
   if (selection.items.length === 0)
-    return showResultDialog(results.errorNoSelection, languageCode);
+    return showResultDialog(strings.errorNoSelection, languageCode);
 
-  let dialogResult = await getResultFromControlDialog(results, languageCode);
+  let dialogResult = await getResultFromControlDialog(strings, languageCode);
   if (dialogResult === "reasonCanceled") return;
 
   return exportRendition(selection, dialogResult, languageCode);
@@ -31,14 +31,14 @@ async function exportRendition(selection, dialogResult, languageCode) {
     );
 
     // Success! Let the user know!
-    return showResultDialog(results.success, languageCode, renditionResults);
+    return showResultDialog(strings.success, languageCode, renditionResults);
   } catch (err) {
     const prefs = await getPrefs();
     console.log("[Error]", err.message);
     console.log("prefs", prefs);
 
     if (err.message === "errorNoFolder" && prefs.skipNoFolderMessage) return;
-    return showResultDialog(results[err.message], languageCode);
+    return showResultDialog(strings[err.message], languageCode);
   }
 }
 

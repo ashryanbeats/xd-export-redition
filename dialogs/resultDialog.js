@@ -1,14 +1,14 @@
 const { formStyles } = require("./styles.js");
 const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
-function showResultDialog(resultStrings, languageCode, renditionResults) {
+function showResultDialog(strings, languageCode, renditionResults) {
   // HTML markup
   document.body.innerHTML = `
     ${formStyles}
     <dialog>
       <form method="dialog">
-        <h1>${resultStrings[languageCode].h1}</h1>
-        <p>${resultStrings[languageCode].p}</p>
+        <h1>${strings[languageCode].h1}</h1>
+        <p>${strings[languageCode].p}</p>
         ${
           renditionResults
             ? `<input type="text" readonly uxp-quiet="true" value="${
@@ -18,7 +18,7 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
         }
         <footer>
           ${
-            resultStrings[languageCode].checkbox
+            strings[languageCode].checkbox
               ? `
             <label class="row row-wrapper">
               <input type="checkbox" id="skip-no-folder-msg"/>
@@ -28,7 +28,7 @@ function showResultDialog(resultStrings, languageCode, renditionResults) {
               : ""
           }
           <button uxp-variant="cta" id="ok-button">${
-            resultStrings[languageCode].button
+            strings[languageCode].button
           }</button>
         </footer>
       </form>

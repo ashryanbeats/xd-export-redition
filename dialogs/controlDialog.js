@@ -5,11 +5,11 @@ const {
   getImageTypeOptions
 } = require("../file-handlers/prefs.js");
 
-async function getResultFromControlDialog(results, languageCode) {
+async function getResultFromControlDialog(strings, languageCode) {
   const intialPrefs = await getPrefs();
 
   const dialog = await getControlDialog(
-    results.controls,
+    strings.controls,
     languageCode,
     intialPrefs
   );
@@ -17,26 +17,28 @@ async function getResultFromControlDialog(results, languageCode) {
   return await dialog.showModal();
 }
 
-async function getControlDialog(resultStrings, languageCode, intialPrefs) {
+async function getControlDialog(strings, languageCode, intialPrefs) {
   const imageTypeOptions = getImageTypeOptions();
   const imageTypePref = intialPrefs.renditionType;
+
+  console.log(strings);
 
   // HTML markup
   document.body.innerHTML = `
     ${formStyles}
     <dialog id="control-dialog">
       <form id="control-form" method="dialog">
-        <h1>${resultStrings[languageCode].h1}</h1>
+        <h1>${strings[languageCode].h1}</h1>
         <label class="row row-wrapper">
-          <span>File name</span>
-          <input id="file-name" type="text" uxp-quiet="false" placeholder="Enter a file name" ${
-            intialPrefs.filename.length
-              ? `value="${intialPrefs.filename}"`
-              : null
-          } />
+          <span>${strings[languageCode].filenameLabel}</span>
+          <input id="file-name" type="text" uxp-quiet="false" placeholder="${
+            strings[languageCode].filenamePlaceholder
+          }" ${
+    intialPrefs.filename.length ? `value="${intialPrefs.filename}"` : null
+  } />
         </label>
         <label class="row row-wrapper">
-          <span>Image type to render</span>
+          <span>${strings[languageCode].renditionTypeLabel}</span>
           <select id="file-type-select">
             ${getImageTypeOptions().map(el => {
               return `<option value="${el}">${el.toUpperCase()}</option>`;
@@ -45,25 +47,25 @@ async function getControlDialog(resultStrings, languageCode, intialPrefs) {
         </label>
         <label>
           <div class="row spread">
-            <span>Render scale</span>
-            <span id="scale-display-value">${intialPrefs.scale}</span>
+            <span>${strings[languageCode].renderScaleLabel}</span>
+            <span id="scale-display-value">${intialPrefs.scale}x</span>
           </div>
           <input id="scale-range" type="range" min=1 max=5 step=1 value=${
             intialPrefs.scale
           } />
         </label>
         <label class="row row-wrapper">
-          <span>Overwrite existing file</span>
+          <span>${strings[languageCode].overwriteFileLabel}</span>
           <input type="checkbox" id="overwrite-file"/ ${
             intialPrefs.overwriteFile ? "checked" : ""
           }>
         </label>
         <footer>
           <button id="cancel-button">${
-            resultStrings[languageCode].cancelButton
+            strings[languageCode].cancelButton
           }</button>
           <button type="submit" uxp-variant="cta" id="ok-button">${
-            resultStrings[languageCode].okButton
+            strings[languageCode].okButton
           }</button>
         </footer>
       </form>
@@ -91,7 +93,7 @@ function getControlDialogWithEventHandlers(intialPrefs) {
   const scaleDisplayValue = document.querySelector("#scale-display-value");
   scaleRange.addEventListener(
     "change",
-    e => (scaleDisplayValue.textContent = e.target.value)
+    e => (scaleDisplayValue.textContent = `${e.target.value}x`)
   );
 
   return dialog;

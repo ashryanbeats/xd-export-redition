@@ -1,5 +1,5 @@
 const application = require("application");
-const { localFileSystem, errors } = require("uxp").storage;
+const { localFileSystem } = require("uxp").storage;
 
 // Creates the rendition and returns the results.
 async function renderToFile(selectionItemToRender, prefs) {
