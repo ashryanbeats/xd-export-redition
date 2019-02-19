@@ -2,9 +2,13 @@ const application = require("application");
 const { localFileSystem } = require("uxp").storage;
 
 // Creates the rendition and returns the results.
-async function renderToFile(selectionItemToRender, prefs) {
+async function renderToFile(
+  selectionItemToRender,
+  prefs,
+  options = { preview: false }
+) {
   // Try to create a File that will contain the output of the rendition.
-  let file = await createFile(prefs);
+  let file = await createFile(prefs, options);
 
   const renditionSettings = [
     {
@@ -30,9 +34,13 @@ async function renderToFile(selectionItemToRender, prefs) {
 // tries to create a File that will contain the output of the rendition.
 // This will fail if the user doesn't select a destination folder in the picker
 // or if file overwrite isn't set to true and the file already exists.
-async function createFile(prefs) {
-  const folder = await localFileSystem.getFolder();
+async function createFile(prefs, options) {
+  const folder = options.preview
+    ? await localFileSystem.getTemporaryFolder()
+    : await localFileSystem.getFolder();
   if (!folder) throw new Error("errorNoFolder");
+
+  console.log(folder.nativePath);
 
   const filenameWithExtension = `${prefs.filename}.${prefs.renditionType}`;
 

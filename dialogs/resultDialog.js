@@ -5,7 +5,7 @@ function showResultDialog(strings, languageCode, renditionResults) {
   // HTML markup
   document.body.innerHTML = `
     ${formStyles}
-    <dialog>
+    <dialog id="result-dialog">
       <form method="dialog">
         <h1>${strings[languageCode].h1}</h1>
         <p>${strings[languageCode].p}</p>

@@ -5,7 +5,7 @@ const defaultPrefs = {
   skipNoFolderMessage: false,
   renditionType: application.RenditionType.PNG,
   overwriteFile: true,
-  scale: 2,
+  scale: 1,
   filename: ""
 };
 
@@ -50,5 +50,6 @@ async function getPrefs() {
 module.exports = {
   getPrefs,
   createPrefs,
-  getImageTypeOptions
+  getImageTypeOptions,
+  defaultPrefs
 };

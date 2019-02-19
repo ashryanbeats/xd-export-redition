@@ -1,8 +1,11 @@
+const application = require("application");
+const { renderToFile } = require("../file-handlers/render.js");
 const { formStyles } = require("./styles.js");
 const {
   createPrefs,
   getPrefs,
-  getImageTypeOptions
+  getImageTypeOptions,
+  defaultPrefs
 } = require("../file-handlers/prefs.js");
 
 /**
@@ -32,6 +35,17 @@ async function getResultFromControlDialog(strings, languageCode) {
  */
 async function getControlDialog(strings, languageCode, initialPrefs) {
   const imageTypeOptions = getImageTypeOptions();
+  const { selection } = require("scenegraph");
+
+  const previewRenditionResults = await renderToFile(
+    selection.items[0],
+    {
+      ...defaultPrefs,
+      scale: 0.8,
+      filename: "preview"
+    },
+    { preview: true }
+  );
 
   // HTML markup
   document.body.innerHTML = `
@@ -39,37 +53,48 @@ async function getControlDialog(strings, languageCode, initialPrefs) {
     <dialog id="control-dialog">
       <form id="control-form" method="dialog">
         <h1>${strings[languageCode].h1}</h1>
-        <label class="row row-wrapper">
-          <span>${strings[languageCode].filenameLabel}</span>
-          <input id="file-name" type="text" uxp-quiet="false" placeholder="${
-            strings[languageCode].filenamePlaceholder
-          }" ${
+
+        <div id="controls" class="section">
+          <label class="row row-wrapper">
+            <span>${strings[languageCode].filenameLabel}</span>
+            <input id="file-name" type="text" uxp-quiet="false" placeholder="${
+              strings[languageCode].filenamePlaceholder
+            }" ${
     initialPrefs.filename.length ? `value="${initialPrefs.filename}"` : null
   } />
-        </label>
-        <label class="row row-wrapper">
-          <span>${strings[languageCode].renditionTypeLabel}</span>
-          <select id="file-type-select">
-            ${imageTypeOptions.map(el => {
-              return `<option value="${el}">${el.toUpperCase()}</option>`;
-            })}
-          </select>
-        </label>
-        <label>
-          <div class="row spread">
-            <span>${strings[languageCode].renderScaleLabel}</span>
-            <span id="scale-display-value">${initialPrefs.scale}x</span>
-          </div>
-          <input id="scale-range" type="range" min=1 max=5 step=1 value=${
-            initialPrefs.scale
-          } />
-        </label>
-        <label class="row row-wrapper">
-          <span>${strings[languageCode].overwriteFileLabel}</span>
-          <input type="checkbox" id="overwrite-file"/ ${
-            initialPrefs.overwriteFile ? "checked" : ""
-          }>
-        </label>
+          </label>
+          <label class="row row-wrapper">
+            <span>${strings[languageCode].renditionTypeLabel}</span>
+            <select id="file-type-select">
+              ${imageTypeOptions.map(el => {
+                return `<option value="${el}">${el.toUpperCase()}</option>`;
+              })}
+            </select>
+          </label>
+          <label>
+            <div class="row spread">
+              <span>${strings[languageCode].renderScaleLabel}</span>
+              <span id="scale-display-value">${initialPrefs.scale}x</span>
+            </div>
+            <input id="scale-range" type="range" min=1 max=5 step=1 value=${
+              initialPrefs.scale
+            } />
+          </label>
+          <label class="row row-wrapper">
+            <span>${strings[languageCode].overwriteFileLabel}</span>
+            <input type="checkbox" id="overwrite-file"/ ${
+              initialPrefs.overwriteFile ? "checked" : ""
+            }>
+          </label>
+        </div>
+
+        <div id="preview" class="section">
+          <h2>Image preview</h2>
+          <label class="row row-wrapper img-wrapper">
+            <img src="${previewRenditionResults[0].outputFile.url}" />
+          </label>
+        </div>
+
         <footer>
           <button id="cancel-button">${
             strings[languageCode].cancelButton
@@ -78,6 +103,7 @@ async function getControlDialog(strings, languageCode, initialPrefs) {
             strings[languageCode].okButton
           }</button>
         </footer>
+
       </form>
     </dialog>
   `;
