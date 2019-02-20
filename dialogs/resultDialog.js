@@ -3,7 +3,6 @@ const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
 function showResultDialog(
   strings,
-  languageCode,
   options = { isError: false, renditionResults: null }
 ) {
   // HTML markup
@@ -11,10 +10,8 @@ function showResultDialog(
     ${formStyles}
     <dialog id="result-dialog">
       <form method="dialog">
-        <h1 ${options.isError ? `class="color-red"` : null}>${
-    strings[languageCode].h1
-  }</h1>
-        <p>${strings[languageCode].p}</p>
+        <h1 ${options.isError ? `class="color-red"` : null}>${strings.h1}</h1>
+        <p>${strings.p}</p>
         ${
           options.renditionResults
             ? `<input type="text" readonly uxp-quiet="true" value="${
@@ -24,7 +21,7 @@ function showResultDialog(
         }
         <footer>
           ${
-            strings[languageCode].checkbox
+            strings.checkbox
               ? `
             <label class="row row-wrapper">
               <input type="checkbox" id="skip-no-folder-msg"/>
@@ -33,9 +30,7 @@ function showResultDialog(
           `
               : ""
           }
-          <button uxp-variant="cta" id="ok-button">${
-            strings[languageCode].button
-          }</button>
+          <button uxp-variant="cta" id="ok-button">${strings.button}</button>
         </footer>
       </form>
     </dialog>

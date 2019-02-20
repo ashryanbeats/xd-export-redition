@@ -40,8 +40,6 @@ async function createFile(prefs, options) {
     : await localFileSystem.getFolder();
   if (!folder) throw new Error("errorNoFolder");
 
-  console.log(folder.nativePath);
-
   const filenameWithExtension = `${prefs.filename}.${prefs.renditionType}`;
 
   try {

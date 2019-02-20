@@ -1,4 +1,3 @@
-const application = require("application");
 const { renderToFile } = require("../file-handlers/render.js");
 const { formStyles } = require("./styles.js");
 const {
@@ -10,35 +9,28 @@ const {
 
 /**
  * Shows the control dialog modal, passing back any return value from the modal.
- * @param {Object} strings - An object containing UI strings for the modal.
- * @param {application.appLanguage} languageCode - The current language the application UI is using.
  * @returns {(string|Object)} Error string or Object containing settings for the render.
  */
-async function getResultFromControlDialog(strings, languageCode) {
+async function getResultFromControlDialog(strings, selectionItemToRender) {
   const initialPrefs = await getPrefs();
 
   const dialog = await getControlDialog(
-    strings.controls,
-    languageCode,
+    strings,
+    selectionItemToRender,
     initialPrefs
   );
-
   return await dialog.showModal();
 }
 
 /**
  * Appends the dialog to the DOM.
- * @param {Object} strings - An object containing UI strings for the modal.
- * @param {application.appLanguage} languageCode - The current language the application UI is using.
  * @param {Object} initialPrefs - An object of preference settings currently stored in prefs.json.
  * @returns {HTMLDialogElement} The control dialog element.
  */
-async function getControlDialog(strings, languageCode, initialPrefs) {
+async function getControlDialog(strings, selectionItemToRender, initialPrefs) {
   const imageTypeOptions = getImageTypeOptions();
-  const { selection } = require("scenegraph");
-
   const previewRenditionResults = await renderToFile(
-    selection.items[0],
+    selectionItemToRender,
     {
       ...defaultPrefs,
       scale: 0.8,
@@ -52,19 +44,19 @@ async function getControlDialog(strings, languageCode, initialPrefs) {
     ${formStyles}
     <dialog id="control-dialog">
       <form id="control-form" method="dialog">
-        <h1>${strings[languageCode].h1}</h1>
+        <h1>${strings.h1}</h1>
 
         <div id="controls" class="section">
           <label class="row row-wrapper">
-            <span>${strings[languageCode].filenameLabel}</span>
+            <span>${strings.filenameLabel}</span>
             <input id="file-name" type="text" uxp-quiet="false" placeholder="${
-              strings[languageCode].filenamePlaceholder
+              strings.filenamePlaceholder
             }" ${
     initialPrefs.filename.length ? `value="${initialPrefs.filename}"` : null
   } />
           </label>
           <label class="row row-wrapper">
-            <span>${strings[languageCode].renditionTypeLabel}</span>
+            <span>${strings.renditionTypeLabel}</span>
             <select id="file-type-select">
               ${imageTypeOptions.map(el => {
                 return `<option value="${el}">${el.toUpperCase()}</option>`;
@@ -73,7 +65,7 @@ async function getControlDialog(strings, languageCode, initialPrefs) {
           </label>
           <label>
             <div class="row spread">
-              <span>${strings[languageCode].renderScaleLabel}</span>
+              <span>${strings.renderScaleLabel}</span>
               <span id="scale-display-value">${initialPrefs.scale}x</span>
             </div>
             <input id="scale-range" type="range" min=1 max=5 step=1 value=${
@@ -81,7 +73,7 @@ async function getControlDialog(strings, languageCode, initialPrefs) {
             } />
           </label>
           <label class="row row-wrapper">
-            <span>${strings[languageCode].overwriteFileLabel}</span>
+            <span>${strings.overwriteFileLabel}</span>
             <input type="checkbox" id="overwrite-file"/ ${
               initialPrefs.overwriteFile ? "checked" : ""
             }>
@@ -96,11 +88,9 @@ async function getControlDialog(strings, languageCode, initialPrefs) {
         </div>
 
         <footer>
-          <button id="cancel-button">${
-            strings[languageCode].cancelButton
-          }</button>
+          <button id="cancel-button">${strings.cancelButton}</button>
           <button type="submit" uxp-variant="cta" id="ok-button">${
-            strings[languageCode].okButton
+            strings.okButton
           }</button>
         </footer>
 
