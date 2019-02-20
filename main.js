@@ -39,7 +39,9 @@ async function exportRendition(selection, dialogResult, languageCode) {
     );
 
     // Success! Let the user know!
-    return showResultDialog(strings.success, languageCode, renditionResults);
+    return showResultDialog(strings.success, languageCode, {
+      renditionResults
+    });
   } catch (err) {
     // Exit if there is an error encountered along the way.
     const prefs = await getPrefs();
@@ -49,7 +51,9 @@ async function exportRendition(selection, dialogResult, languageCode) {
     // Skip the results dialog if the user has set the skip preference.
     if (err.message === "errorNoFolder" && prefs.skipNoFolderMessage) return;
     // Error! Let the user know!
-    return showResultDialog(strings[err.message], languageCode);
+    return showResultDialog(strings[err.message], languageCode, {
+      isError: true
+    });
   }
 }
 

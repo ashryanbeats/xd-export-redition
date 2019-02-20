@@ -1,18 +1,24 @@
 const { formStyles } = require("./styles.js");
 const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
-function showResultDialog(strings, languageCode, renditionResults) {
+function showResultDialog(
+  strings,
+  languageCode,
+  options = { isError: false, renditionResults: null }
+) {
   // HTML markup
   document.body.innerHTML = `
     ${formStyles}
     <dialog id="result-dialog">
       <form method="dialog">
-        <h1>${strings[languageCode].h1}</h1>
+        <h1 ${options.isError ? `class="color-red"` : null}>${
+    strings[languageCode].h1
+  }</h1>
         <p>${strings[languageCode].p}</p>
         ${
-          renditionResults
+          options.renditionResults
             ? `<input type="text" readonly uxp-quiet="true" value="${
-                renditionResults[0].outputFile.nativePath
+                options.renditionResults[0].outputFile.nativePath
               }">`
             : ""
         }
