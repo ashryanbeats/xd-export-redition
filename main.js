@@ -27,7 +27,7 @@ async function initiatePlugin(selection) {
   // Exit if the user clicked Cancel or pressed Escape
   if (dialogResult === "reasonCanceled") return;
 
-  return exportRendition(selection, dialogResult);
+  return await exportRendition(selection, dialogResult);
 }
 
 /**

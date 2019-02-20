@@ -42,7 +42,7 @@ function showResultDialog(
     skipNoFolderMsg.addEventListener("change", updateNoFolderPref);
 
   const okButton = document.querySelector("#ok-button");
-  okButton.addEventListener("click", e => dialog.close());
+  okButton.addEventListener("click", _ => dialog.close());
 
   // Show the modal
   const dialog = document.querySelector("dialog");

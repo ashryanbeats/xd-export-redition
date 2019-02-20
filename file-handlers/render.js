@@ -1,4 +1,4 @@
-const application = require("application");
+const { createRenditions } = require("application");
 const { localFileSystem } = require("uxp").storage;
 
 // Creates the rendition and returns the results.
@@ -24,7 +24,7 @@ async function renderToFile(
 
   // Try to create the rendition as configured in `renditionSettings`
   try {
-    return await application.createRenditions(renditionSettings);
+    return await createRenditions(renditionSettings);
   } catch (err) {
     throw new Error("errorRenditionsFailed");
   }
