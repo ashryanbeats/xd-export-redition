@@ -15,6 +15,10 @@ form {
   margin-bottom: 14px;
 }
 
+.img-wrapper {
+  height: 300px;
+}
+
 img {
   max-width: 100%;
   max-height: 300px;
