@@ -1,7 +1,22 @@
 const { formStyles } = require("./styles.js");
 const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
-function showResultDialog(
+async function showResultDialog(
+  strings,
+  options = { isError: false, renditionResults: null }
+) {
+  let dialog = document.querySelector("#result-dialog");
+
+  if (dialog) {
+    return await dialog.showModal();
+  } else {
+    dialog = createResultDialog(strings, options);
+
+    return await dialog.showModal();
+  }
+}
+
+function createResultDialog(
   strings,
   options = { isError: false, renditionResults: null }
 ) {
@@ -46,7 +61,7 @@ function showResultDialog(
 
   // Show the modal
   const dialog = document.querySelector("dialog");
-  return dialog.showModal();
+  return dialog;
 }
 
 async function updateNoFolderPref(e) {

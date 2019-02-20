@@ -14,12 +14,19 @@ const {
 async function getResultFromControlDialog(strings, selectionItemToRender) {
   const initialPrefs = await getPrefs();
 
-  const dialog = await getControlDialog(
-    strings,
-    selectionItemToRender,
-    initialPrefs
-  );
-  return await dialog.showModal();
+  let dialog = document.querySelector("#control-dialog");
+
+  if (dialog) {
+    return await dialog.showModal();
+  } else {
+    dialog = await getControlDialog(
+      strings,
+      selectionItemToRender,
+      initialPrefs
+    );
+
+    return await dialog.showModal();
+  }
 }
 
 /**

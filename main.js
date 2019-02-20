@@ -14,7 +14,7 @@ async function initiatePlugin(selection) {
 
   // Exit if there is no selection
   if (!selectionItemToRender)
-    return showResultDialog(strings.errorNoSelection[appLanguage], {
+    return await showResultDialog(strings.errorNoSelection[appLanguage], {
       isError: true
     });
 
@@ -45,7 +45,9 @@ async function exportRendition(selection, dialogResult) {
     );
 
     // Success! Let the user know!
-    return showResultDialog(strings.success[appLanguage], { renditionResults });
+    return await showResultDialog(strings.success[appLanguage], {
+      renditionResults
+    });
   } catch (err) {
     // Exit if there is an error encountered along the way.
     const prefs = await getPrefs();
@@ -55,7 +57,7 @@ async function exportRendition(selection, dialogResult) {
     // Skip the results dialog if the user has set the skip preference.
     if (err.message === "errorNoFolder" && prefs.skipNoFolderMessage) return;
     // Error! Let the user know!
-    return showResultDialog(strings[err.message][appLanguage], {
+    return await showResultDialog(strings[err.message][appLanguage], {
       isError: true
     });
   }
