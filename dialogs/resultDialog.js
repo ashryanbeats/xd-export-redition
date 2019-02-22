@@ -10,15 +10,10 @@ const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
  * @returns {string} The return value of `dialog#close`. Currently an empty string.
  */
 async function showResultDialog(strings, options) {
-  let dialog = document.querySelector("#result-dialog");
+  let dialog = getResultDialog(strings, options);
 
-  if (dialog) {
-    return await dialog.showModal();
-  } else {
-    dialog = getResultDialog(strings, options);
-
-    return await dialog.showModal();
-  }
+  await dialog.showModal();
+  dialog.remove();
 }
 
 /**

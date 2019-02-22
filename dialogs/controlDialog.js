@@ -14,16 +14,12 @@ const {
  * @returns {(string|Object)} Error string or object containing settings for the render.
  */
 async function getResultFromControlDialog(strings, selectionItemToRender) {
-  let dialog = document.querySelector("#control-dialog");
+  let dialog = await getControlDialog(strings, selectionItemToRender);
 
-  // Reuse dialog if already in the DOM; otherwise, create it
-  if (dialog) {
-    return await dialog.showModal();
-  } else {
-    dialog = await getControlDialog(strings, selectionItemToRender);
+  const controlSettings = await dialog.showModal();
+  dialog.remove();
 
-    return await dialog.showModal();
-  }
+  return controlSettings;
 }
 
 /**
