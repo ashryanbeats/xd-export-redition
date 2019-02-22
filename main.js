@@ -7,7 +7,7 @@ const { getPrefs } = require("./file-handlers/prefs.js");
 
 /**
  * Initiates the plugin by performing selection check and running the control dialog.
- * @param {selection} selection - The currently selected node in XD'd UI.
+ * @param {selection} selection - The currently selected node in XD's UI.
  */
 async function initiatePlugin(selection) {
   const selectionItemToRender = selection.items[0];
@@ -27,18 +27,18 @@ async function initiatePlugin(selection) {
   // Exit if the user clicked Cancel or pressed Escape
   if (dialogResult === "reasonCanceled") return;
 
-  return await exportRendition(selection, dialogResult);
+  // Handle export and exit
+  return await exportRendition(selectionItemToRender, dialogResult);
 }
 
 /**
  * Shows the results dialog modal that communicates the outcome of running the plugin to the user.
- * @param {selection} selection - The currently selected node in XD'd UI.
+ * @param {selection} selection - The currently selected node in XD's UI.
  * @param {Object} dialogResult - The results of successfully running the control dialog. An Object containing settings for the render.
  */
-async function exportRendition(selection, dialogResult) {
-  // Try to get rendition results for the first item in the selection.
+async function exportRendition(selectionItemToRender, dialogResult) {
+  // Try to get rendition results for the selection item.
   try {
-    const selectionItemToRender = selection.items[0];
     const renditionResults = await renderToFile(
       selectionItemToRender,
       dialogResult
