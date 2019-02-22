@@ -51,7 +51,9 @@ async function getControlDialog(strings, selectionItemToRender) {
     <dialog id="control-dialog">
       <form id="control-form" method="dialog">
         <h1>${strings.h1}</h1>
+        <hr />
 
+        <h2>Settings</h2>
         <div id="controls" class="section">
           <label class="row row-wrapper">
             <span>${strings.filenameLabel}</span>

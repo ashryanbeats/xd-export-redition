@@ -2,7 +2,7 @@ const formStyles = `
 <style>
 
 #control-dialog {
-  height: 600px;
+  height: 700px;
   overflow-y: scroll;
 }
 
