@@ -9,21 +9,18 @@ const {
 
 /**
  * Shows the control dialog modal, passing back any return value from the modal.
- * @returns {(string|Object)} Error string or Object containing settings for the render.
+ * @param {Object} strings - Localized strings for the dialog.
+ * @param {SceneNode} selectionItemToRender - The user-selected XD object for export.
+ * @returns {(string|Object)} Error string or object containing settings for the render.
  */
 async function getResultFromControlDialog(strings, selectionItemToRender) {
-  const initialPrefs = await getPrefs();
-
   let dialog = document.querySelector("#control-dialog");
 
+  // Reuse dialog if already in the DOM; otherwise, create it
   if (dialog) {
     return await dialog.showModal();
   } else {
-    dialog = await getControlDialog(
-      strings,
-      selectionItemToRender,
-      initialPrefs
-    );
+    dialog = await getControlDialog(strings, selectionItemToRender);
 
     return await dialog.showModal();
   }
@@ -31,11 +28,17 @@ async function getResultFromControlDialog(strings, selectionItemToRender) {
 
 /**
  * Appends the dialog to the DOM.
- * @param {Object} initialPrefs - An object of preference settings currently stored in prefs.json.
+ * @param {Object} strings - Localized strings for the dialog.
+ * @param {SceneNode} selectionItemToRender - The user-selected XD object for export.
  * @returns {HTMLDialogElement} The control dialog element.
  */
-async function getControlDialog(strings, selectionItemToRender, initialPrefs) {
+async function getControlDialog(strings, selectionItemToRender) {
+  // Get an object of preference settings currently stored in prefs.json
+  const initialPrefs = await getPrefs();
+  // Get an array of supported export image types from XD
   const imageTypeOptions = getImageTypeOptions();
+
+  // Create a preview image for display in the dialog
   const previewRenditionResults = await renderToFile(
     selectionItemToRender,
     {
@@ -59,9 +62,10 @@ async function getControlDialog(strings, selectionItemToRender, initialPrefs) {
             <input id="file-name" type="text" uxp-quiet="false" placeholder="${
               strings.filenamePlaceholder
             }" ${
-    initialPrefs.filename.length ? `value="${initialPrefs.filename}"` : null
+    initialPrefs.filename.length ? `value="${initialPrefs.filename}"` : ""
   } />
           </label>
+
           <label class="row row-wrapper">
             <span>${strings.renditionTypeLabel}</span>
             <select id="file-type-select">
@@ -70,15 +74,20 @@ async function getControlDialog(strings, selectionItemToRender, initialPrefs) {
               })}
             </select>
           </label>
+
           <label>
             <div class="row spread">
               <span>${strings.renderScaleLabel}</span>
-              <span id="scale-display-value">${initialPrefs.scale}x</span>
+              <span>
+                <span id="scale-display-value">${initialPrefs.scale}</span>
+                <span>x</span>
+              </span>
             </div>
             <input id="scale-range" type="range" min=1 max=5 step=1 value=${
               initialPrefs.scale
             } />
           </label>
+
           <label class="row row-wrapper">
             <span>${strings.overwriteFileLabel}</span>
             <input type="checkbox" id="overwrite-file"/ ${
@@ -115,14 +124,22 @@ async function getControlDialog(strings, selectionItemToRender, initialPrefs) {
  * @returns {HTMLDialogElement} The control dialog element.
  */
 function getControlDialogWithEventHandlers(initialPrefs) {
-  // Add event handlers
-  const [dialog, form, scaleRange, cancelButton, okButton] = [
+  // Reference elements in the DOM
+  const [
+    dialog,
+    form,
+    scaleRange,
+    scaleDisplayValue,
+    cancelButton,
+    okButton
+  ] = [
     "#control-dialog",
     "#control-dialog form",
     "#scale-range",
+    "#scale-display-value",
     "#cancel-button",
     "#ok-button"
-  ].map(s => document.querySelector(s));
+  ].map(sel => document.querySelector(sel));
 
   // Close dialog when cancel is clicked.
   // Note that XD handles the ESC key for you, also returning `reasonCanceled`
@@ -135,11 +152,10 @@ function getControlDialogWithEventHandlers(initialPrefs) {
   // Handle form submit via return key
   form.onsubmit = e => handleSubmit(e, dialog, initialPrefs);
 
-  // Update display value for render scale when the range is changed.
-  const scaleDisplayValue = document.querySelector("#scale-display-value");
+  // Update display value for render scale when the range is changed by the user.
   scaleRange.addEventListener(
     "change",
-    e => (scaleDisplayValue.textContent = `${e.target.value}x`)
+    e => (scaleDisplayValue.textContent = e.target.value)
   );
 
   return dialog;
@@ -157,14 +173,20 @@ function setSelectedFileType(imageTypeOptions, imageTypePref) {
   select.selectedIndex = imageTypeOptions.indexOf(imageTypePref);
 }
 
+/**
+ * Generic submit handler for button click and form submit.
+ * @param {Object} e - The event.
+ * @param {HTMLDialogElement} dialog - The control dialog element.
+ * @param {*} initialPrefs - An object of preference settings currently stored in prefs.json.
+ */
 async function handleSubmit(e, dialog, initialPrefs) {
   saveAndClose(dialog, initialPrefs);
   e.preventDefault();
 }
 
 /**
- * Saves preferences and closes the dialog, passing back those saved preferences.
- * @param {HTMLDialogElement} dialog The control dialog element.
+ * Saves preferences set in the UI and closes the dialog, passing back those saved preferences.
+ * @param {HTMLDialogElement} dialog - The control dialog element.
  * @param {Object} initialPrefs - An object of preference settings currently stored in prefs.json.
  * @returns {Object} Updated preferences stored in prefs.json.
  */
@@ -174,6 +196,11 @@ async function saveAndClose(dialog, initialPrefs) {
   return await dialog.close(savedPrefs);
 }
 
+/**
+ * Convenience method for getting preferences from the control dialog and saving them.
+ * @param {Object} initialPrefs - An object of preference settings currently stored in prefs.json.
+ * @returns {Object} An object of preference settings just newly stored in prefs.json
+ */
 async function savePrefs(initialPrefs) {
   const prefsToSave = getSettingsFromForm(initialPrefs);
   return await createPrefs(prefsToSave);
