@@ -55,7 +55,7 @@ function getResultDialog(strings, options) {
           `
               : ""
           }
-          <button type="submit" uxp-variant="cta" id="ok-button">${
+          <button type="submit" uxp-variant="primary" id="ok-button" autofocus>${
             strings.button
           }</button>
         </footer>
@@ -82,10 +82,15 @@ function getResultDialogWithEventHandlers() {
   if (skipNoFolderMsg)
     skipNoFolderMsg.addEventListener("change", updateNoFolderPref);
 
-  okButton.addEventListener("click", _ => dialog.close());
-  form.onsubmit = _ => dialog.close();
+  okButton.addEventListener("click", e => handleSubmit(e, dialog));
+  form.onsubmit = e => handleSubmit(e, dialog);
 
   return dialog;
+}
+
+function handleSubmit(e, dialog) {
+  dialog.close();
+  e.preventDefault();
 }
 
 /**
