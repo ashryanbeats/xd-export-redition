@@ -52,15 +52,23 @@ function createResultDialog(
   `;
 
   // Add event handlers
-  const skipNoFolderMsg = document.querySelector("#skip-no-folder-msg");
+  const [dialog, form, skipNoFolderMsg, okButton] = [
+    "dialog",
+    "form",
+    "#skip-no-folder-msg",
+    "#ok-button"
+  ].map(sel => document.querySelector(sel));
+
+  [dialog, form, skipNoFolderMsg, okButton].map(el =>
+    el ? console.log(el.innerHTML) : console.log("NADA")
+  );
+
   if (skipNoFolderMsg)
     skipNoFolderMsg.addEventListener("change", updateNoFolderPref);
 
-  const okButton = document.querySelector("#ok-button");
   okButton.addEventListener("click", _ => dialog.close());
+  form.onsubmit = _ => dialog.close();
 
-  // Show the modal
-  const dialog = document.querySelector("dialog");
   return dialog;
 }
 
