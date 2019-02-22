@@ -1,19 +1,35 @@
 const { formStyles } = require("./styles.js");
 const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
+/**
+ *
+ * @param {Object} strings - Localized strings for the dialog.
+ * @param {Object} [options] - Configuration options for the results dialog.
+ * @param {string} [options.isError=false] - Flag for when the result is an error.
+ * @param {RenditionResult[]} [options.renditionResults] - Rendition result data from XD on successful export.
+ * @returns {string} The return value of `dialog#close`. Currently an empty string.
+ */
 async function showResultDialog(strings, options) {
   let dialog = document.querySelector("#result-dialog");
 
   if (dialog) {
     return await dialog.showModal();
   } else {
-    dialog = createResultDialog(strings, options);
+    dialog = getResultDialog(strings, options);
 
     return await dialog.showModal();
   }
 }
 
-function createResultDialog(strings, options) {
+/**
+ * Appends the dialog to the DOM.
+ * @param {Object} strings - Localized strings for the dialog.
+ * @param {Object} [options] - Configuration options for the results dialog.
+ * @param {string} [options.isError=false] - Flag for when the result is an error.
+ * @param {RenditionResult[]} [options.renditionResults] - Rendition result data from XD on successful export.
+ * @returns {HTMLDialogElement} The result dialog element.
+ */
+function getResultDialog(strings, options) {
   // HTML markup
   document.body.innerHTML = `
     ${formStyles}
@@ -47,6 +63,14 @@ function createResultDialog(strings, options) {
     </dialog>
   `;
 
+  return getResultDialogWithEventHandlers();
+}
+
+/**
+ * Adds the required event handlers to the result dialog.
+ * @returns {HTMLDialogElement} The result dialog element.
+ */
+function getResultDialogWithEventHandlers() {
   // Add event handlers
   const [dialog, form, skipNoFolderMsg, okButton] = [
     "#result-dialog",
@@ -64,6 +88,11 @@ function createResultDialog(strings, options) {
   return dialog;
 }
 
+/**
+ * Stores the user perference for seeing an alert when they don't select a folder from the picker.
+ * @param {Object} e - The event.
+ * @returns {Object} Updated preferences stored in prefs.json.
+ */
 async function updateNoFolderPref(e) {
   const initialPrefs = await getPrefs();
 
