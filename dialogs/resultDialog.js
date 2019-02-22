@@ -1,10 +1,7 @@
 const { formStyles } = require("./styles.js");
 const { getPrefs, createPrefs } = require("../file-handlers/prefs.js");
 
-async function showResultDialog(
-  strings,
-  options = { isError: false, renditionResults: null }
-) {
+async function showResultDialog(strings, options) {
   let dialog = document.querySelector("#result-dialog");
 
   if (dialog) {
@@ -16,16 +13,13 @@ async function showResultDialog(
   }
 }
 
-function createResultDialog(
-  strings,
-  options = { isError: false, renditionResults: null }
-) {
+function createResultDialog(strings, options) {
   // HTML markup
   document.body.innerHTML = `
     ${formStyles}
     <dialog id="result-dialog">
-      <form method="dialog">
-        <h1 ${options.isError ? `class="color-red"` : null}>${strings.h1}</h1>
+      <form id="result-form" method="dialog">
+        <h1 ${options.isError ? `class="color-red"` : ""}>${strings.h1}</h1>
         <p>${strings.p}</p>
         ${
           options.renditionResults
@@ -45,7 +39,9 @@ function createResultDialog(
           `
               : ""
           }
-          <button uxp-variant="cta" id="ok-button">${strings.button}</button>
+          <button type="submit" uxp-variant="cta" id="ok-button">${
+            strings.button
+          }</button>
         </footer>
       </form>
     </dialog>
@@ -53,15 +49,11 @@ function createResultDialog(
 
   // Add event handlers
   const [dialog, form, skipNoFolderMsg, okButton] = [
-    "dialog",
-    "form",
+    "#result-dialog",
+    "#result-form",
     "#skip-no-folder-msg",
     "#ok-button"
   ].map(sel => document.querySelector(sel));
-
-  [dialog, form, skipNoFolderMsg, okButton].map(el =>
-    el ? console.log(el.innerHTML) : console.log("NADA")
-  );
 
   if (skipNoFolderMsg)
     skipNoFolderMsg.addEventListener("change", updateNoFolderPref);
