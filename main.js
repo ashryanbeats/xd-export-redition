@@ -33,7 +33,7 @@ async function initiatePlugin(selection) {
 
 /**
  * Shows the results dialog modal that communicates the outcome of running the plugin to the user.
- * @param {selection} selection - The currently selected node in XD's UI.
+ * @param {selection} selectionItemToRender - The item to export as a rendition.
  * @param {Object} dialogResult - The results of successfully running the control dialog. An Object containing settings for the render.
  */
 async function exportRendition(selectionItemToRender, dialogResult) {
