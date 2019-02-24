@@ -16,14 +16,24 @@ form {
 }
 
 .img-wrapper {
+  margin: 10px auto;
+  padding: 5px;
   height: 300px;
+  width: 95%;
+  background-color: #bdbdbd;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-width: 2px 1px 1px 2px;
+  border-style: solid;
+  border-color: #909090;
 }
 
 img {
   max-width: 100%;
-  max-height: 300px;
-  margin-left: auto;
-  margin-right: auto;
+  max-height: 100%;
+  margin: 0 auto;
 }
 
 .row-wrapper {

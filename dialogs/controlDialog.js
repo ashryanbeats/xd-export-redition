@@ -96,8 +96,10 @@ async function getControlDialog(strings, selectionItemToRender) {
 
         <div id="preview" class="section">
           <h2>Image preview</h2>
-          <label class="row row-wrapper img-wrapper">
-            <img src="${previewRenditionResults[0].outputFile.url}" />
+          <label class="row row-wrapper">
+            <div class="img-wrapper">
+              <img src="${previewRenditionResults[0].outputFile.url}" />
+            </div>
           </label>
         </div>
 
