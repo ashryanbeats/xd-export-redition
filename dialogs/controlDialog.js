@@ -1,3 +1,5 @@
+const { btoa } = require("../base64");
+
 const { renderToFile } = require("../file-handlers/render.js");
 const { formStyles } = require("./styles.js");
 const {
@@ -98,7 +100,7 @@ async function getControlDialog(strings, selectionItemToRender) {
           <h2>Image preview</h2>
           <label class="row row-wrapper">
             <div class="img-wrapper">
-              <img src="${previewRenditionResults[0].outputFile.url}" />
+              <img id="img" />
             </div>
           </label>
         </div>
@@ -114,6 +116,11 @@ async function getControlDialog(strings, selectionItemToRender) {
     </dialog>
   `;
   setSelectedFileType(imageTypeOptions, initialPrefs.renditionType);
+
+  const { formats } = require("uxp").storage;
+  const data = await previewRenditionResults[0].outputFile.read({format: formats.binary});
+  // simple conversion to base64 from https://stackoverflow.com/a/45313868/741043
+  document.querySelector("#img").src = "data:image/png;base64," + btoa(String.fromCharCode(... (new Uint8Array(data))));
 
   return getControlDialogWithEventHandlers(initialPrefs);
 }
